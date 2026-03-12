@@ -1,0 +1,318 @@
+﻿local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+local Camera = workspace.CurrentCamera
+
+-- Settings
+local settings = {
+    espEnabled = true,
+    aimbotEnabled = true,
+    aimbotRange = 100,
+    teamCheckEnabled = false,
+    menuVisible = true
+}
+
+-- Create Main GUI
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "AutoAimESPMenu"
+screenGui.ResetOnSpawn = false
+
+-- Menu Frame
+local menuFrame = Instance.new("Frame", screenGui)
+menuFrame.Name = "MenuFrame"
+menuFrame.Size = UDim2.new(0, 300, 0, 320)
+menuFrame.Position = UDim2.new(0.02, 0, 0.05, 0)
+menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+menuFrame.BorderSizePixel = 2
+menuFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
+
+-- Title
+local titleLabel = Instance.new("TextLabel", menuFrame)
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+titleLabel.BorderSizePixel = 0
+titleLabel.Text = "AUTO AIM ESP"
+titleLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+titleLabel.TextSize = 18
+titleLabel.Font = Enum.Font.GothamBold
+
+-- Close Button
+local closeButton = Instance.new("TextButton", menuFrame)
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeButton.BorderSizePixel = 1
+closeButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 14
+closeButton.Font = Enum.Font.GothamBold
+
+closeButton.MouseButton1Click:Connect(function()
+    settings.menuVisible = false
+    menuFrame.Visible = false
+end)
+
+-- ESP Toggle
+local espLabel = Instance.new("TextLabel", menuFrame)
+espLabel.Size = UDim2.new(0, 150, 0, 40)
+espLabel.Position = UDim2.new(0, 10, 0, 50)
+espLabel.BackgroundTransparency = 1
+espLabel.Text = "ESP: ON"
+espLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+espLabel.TextSize = 14
+espLabel.Font = Enum.Font.Gotham
+espLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local espButton = Instance.new("TextButton", menuFrame)
+espButton.Size = UDim2.new(0, 100, 0, 35)
+espButton.Position = UDim2.new(0, 180, 0, 52)
+espButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+espButton.BorderSizePixel = 1
+espButton.BorderColor3 = Color3.fromRGB(0, 255, 0)
+espButton.Text = "TOGGLE"
+espButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+espButton.TextSize = 12
+espButton.Font = Enum.Font.GothamBold
+
+espButton.MouseButton1Click:Connect(function()
+    settings.espEnabled = not settings.espEnabled
+    espLabel.Text = "ESP: " .. (settings.espEnabled and "ON" or "OFF")
+    espLabel.TextColor3 = settings.espEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    espButton.BackgroundColor3 = settings.espEnabled and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+end)
+
+-- Aimbot Toggle
+local aimbotLabel = Instance.new("TextLabel", menuFrame)
+aimbotLabel.Size = UDim2.new(0, 150, 0, 40)
+aimbotLabel.Position = UDim2.new(0, 10, 0, 100)
+aimbotLabel.BackgroundTransparency = 1
+aimbotLabel.Text = "AIMBOT: ON"
+aimbotLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+aimbotLabel.TextSize = 14
+aimbotLabel.Font = Enum.Font.Gotham
+aimbotLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local aimbotButton = Instance.new("TextButton", menuFrame)
+aimbotButton.Size = UDim2.new(0, 100, 0, 35)
+aimbotButton.Position = UDim2.new(0, 180, 0, 102)
+aimbotButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+aimbotButton.BorderSizePixel = 1
+aimbotButton.BorderColor3 = Color3.fromRGB(0, 255, 0)
+aimbotButton.Text = "TOGGLE"
+aimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+aimbotButton.TextSize = 12
+aimbotButton.Font = Enum.Font.GothamBold
+
+aimbotButton.MouseButton1Click:Connect(function()
+    settings.aimbotEnabled = not settings.aimbotEnabled
+    aimbotLabel.Text = "AIMBOT: " .. (settings.aimbotEnabled and "ON" or "OFF")
+    aimbotLabel.TextColor3 = settings.aimbotEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    aimbotButton.BackgroundColor3 = settings.aimbotEnabled and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+end)
+
+-- Team Check Toggle
+local teamCheckLabel = Instance.new("TextLabel", menuFrame)
+teamCheckLabel.Size = UDim2.new(0, 150, 0, 40)
+teamCheckLabel.Position = UDim2.new(0, 10, 0, 150)
+teamCheckLabel.BackgroundTransparency = 1
+teamCheckLabel.Text = "TEAM CHECK: OFF"
+teamCheckLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+teamCheckLabel.TextSize = 14
+teamCheckLabel.Font = Enum.Font.Gotham
+teamCheckLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local teamCheckButton = Instance.new("TextButton", menuFrame)
+teamCheckButton.Size = UDim2.new(0, 100, 0, 35)
+teamCheckButton.Position = UDim2.new(0, 180, 0, 152)
+teamCheckButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+teamCheckButton.BorderSizePixel = 1
+teamCheckButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
+teamCheckButton.Text = "TOGGLE"
+teamCheckButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teamCheckButton.TextSize = 12
+teamCheckButton.Font = Enum.Font.GothamBold
+
+teamCheckButton.MouseButton1Click:Connect(function()
+    settings.teamCheckEnabled = not settings.teamCheckEnabled
+    teamCheckLabel.Text = "TEAM CHECK: " .. (settings.teamCheckEnabled and "ON" or "OFF")
+    teamCheckLabel.TextColor3 = settings.teamCheckEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    teamCheckButton.BackgroundColor3 = settings.teamCheckEnabled and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+end)
+
+-- Range Label
+local rangeLabel = Instance.new("TextLabel", menuFrame)
+rangeLabel.Size = UDim2.new(1, -20, 0, 30)
+rangeLabel.Position = UDim2.new(0, 10, 0, 200)
+rangeLabel.BackgroundTransparency = 1
+rangeLabel.Text = "Range: " .. settings.aimbotRange .. " studs"
+rangeLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+rangeLabel.TextSize = 12
+rangeLabel.Font = Enum.Font.Gotham
+rangeLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Status Label
+local statusLabel = Instance.new("TextLabel", menuFrame)
+statusLabel.Size = UDim2.new(1, -20, 0, 60)
+statusLabel.Position = UDim2.new(0, 10, 0, 240)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Status: Ready\nPress M to toggle"
+statusLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+statusLabel.TextSize = 11
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.TextWrapped = true
+
+-- Toggle Menu with M key
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.M then
+        settings.menuVisible = not settings.menuVisible
+        menuFrame.Visible = settings.menuVisible
+    end
+end)
+
+print("Main Menu GUI Created Successfully - Press M to toggle menu")
+
+-- Function to aim at target
+local function aimbot(targetPlayer)
+    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local aimPart = targetPlayer.Character.HumanoidRootPart
+        local targetPos = aimPart.Position
+        local cameraPos = Camera.CFrame.Position
+        local direction = (targetPos - cameraPos).unit
+        Camera.CFrame = CFrame.new(cameraPos, cameraPos + direction)
+    end
+end
+
+-- Function to check if player is on same team
+local function isSameTeam(player)
+    if not settings.teamCheckEnabled then
+        return false
+    end
+    
+    local localTeam = localPlayer.Team
+    local playerTeam = player.Team
+    
+    if localTeam and playerTeam and localTeam == playerTeam then
+        return true
+    end
+    
+    return false
+end
+
+-- Function to get health color (green to red)
+local function getHealthColor(health, maxHealth)
+    local healthPercent = math.max(0, math.min(1, health / maxHealth))
+    
+    if healthPercent >= 0.5 then
+        local ratio = (healthPercent - 0.5) * 2
+        return Color3.fromRGB(255 * (1 - ratio), 255, 0)
+    else
+        local ratio = healthPercent * 2
+        return Color3.fromRGB(255, 255 * ratio, 0)
+    end
+end
+
+-- Function to create perfect ESP
+local function createESP(player)
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+    
+    local hrp = player.Character.HumanoidRootPart
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    
+    if not humanoid then return end
+    
+    if hrp:FindFirstChild("ESPGui") then
+        return
+    end
+
+    -- Main ESP Billboard GUI
+    local espGui = Instance.new("BillboardGui")
+    espGui.Name = "ESPGui"
+    espGui.Size = UDim2.new(6, 0, 8, 0)
+    espGui.MaxDistance = 500
+    espGui.Parent = hrp
+
+    -- Container frame
+    local container = Instance.new("Frame", espGui)
+    container.Size = UDim2.new(1, 0, 1, 0)
+    container.BackgroundTransparency = 1
+    container.BorderSizePixel = 0
+
+    -- 2D Box (outline)
+    local boxFrame = Instance.new("Frame", container)
+    boxFrame.Name = "Box"
+    boxFrame.Size = UDim2.new(0.7, 0, 0.6, 0)
+    boxFrame.Position = UDim2.new(0.15, 0, 0.15, 0)
+    boxFrame.BackgroundTransparency = 1
+    boxFrame.BorderSizePixel = 2
+    boxFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
+
+    -- Name Label (above box)
+    local nameLabel = Instance.new("TextLabel", container)
+    nameLabel.Name = "NameLabel"
+    nameLabel.Size = UDim2.new(0.7, 0, 0.15, 0)
+    nameLabel.Position = UDim2.new(0.15, 0, 0, 0)
+    nameLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    nameLabel.BackgroundTransparency = 0.3
+    nameLabel.BorderSizePixel = 1
+    nameLabel.BorderColor3 = Color3.fromRGB(0, 255, 0)
+    nameLabel.Text = player.Name
+    nameLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    nameLabel.TextSize = 12
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextScaled = true
+
+    -- Distance Label (below box)
+    local distanceLabel = Instance.new("TextLabel", container)
+    distanceLabel.Name = "DistanceLabel"
+    distanceLabel.Size = UDim2.new(0.7, 0, 0.12, 0)
+    distanceLabel.Position = UDim2.new(0.15, 0, 0.75, 0)
+    distanceLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    distanceLabel.BackgroundTransparency = 0.3
+    distanceLabel.BorderSizePixel = 1
+    distanceLabel.BorderColor3 = Color3.fromRGB(0, 255, 0)
+    distanceLabel.Text = "0m"
+    distanceLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+    distanceLabel.TextSize = 10
+    distanceLabel.Font = Enum.Font.Gotham
+    distanceLabel.TextScaled = true
+
+    -- Health Bar Background (right side of box)
+    local healthBarBg = Instance.new("Frame", container)
+    healthBarBg.Name = "HealthBarBg"
+    healthBarBg.Size = UDim2.new(0.08, 0, 0.6, 0)
+    healthBarBg.Position = UDim2.new(0.85, 0, 0.15, 0)
+    healthBarBg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    healthBarBg.BorderSizePixel = 1
+    healthBarBg.BorderColor3 = Color3.fromRGB(100, 100, 100)
+
+    -- Health Bar (fills vertically from bottom)
+    local healthBar = Instance.new("Frame", healthBarBg)
+    healthBar.Name = "HealthBar"
+    healthBar.Size = UDim2.new(1, 0, 1, 0)
+    healthBar.Position = UDim2.new(0, 0, 0, 0)
+    healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    healthBar.BorderSizePixel = 0
+
+    -- Update ESP info every frame
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if not settings.espEnabled or not player.Character or not humanoid or humanoid.Health <= 0 then
+            espGui:Destroy()
+            connection:Disconnect()
+            return
+        end
+
+        local distance = (Camera.CFrame.Position - hrp.Position).Magnitude
+        local health = humanoid.Health
+        local maxHealth = humanoid.MaxHealth
+        local healthPercent = math.max(0, math.min(1, health / maxHealth))
+
+        -- Update distance
+        
